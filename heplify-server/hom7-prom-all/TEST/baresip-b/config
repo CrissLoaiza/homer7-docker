@@ -1,0 +1,13 @@
+module_path           /opt/homebrew/opt/baresip/lib/baresip/modules
+sip_listen           192.168.1.185:5063
+audio_player         coreaudio,default
+audio_source         ausine,660
+audio_alert          coreaudio,default
+ausine_max_ptime     20
+module               g711.so
+module               ausine.so
+module               coreaudio.so
+module               account.so
+module               stdio.so
+module_app           menu.so
+module_app           contact.so

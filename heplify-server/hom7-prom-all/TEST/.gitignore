@@ -1,0 +1,8 @@
+# Platform-specific binary, built locally — see README.md for build steps.
+bin/heplify_darwin_arm64
+
+# baresip runtime state — regenerated automatically on first run.
+baresip-a/current_contact
+baresip-b/current_contact
+baresip-a/contacts
+baresip-b/contacts

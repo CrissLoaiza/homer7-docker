@@ -1,0 +1,30 @@
+diff --git a/src/decoder/decoder.go b/src/decoder/decoder.go
+index 48008b7..c0cb70a 100644
+--- a/src/decoder/decoder.go
++++ b/src/decoder/decoder.go
+@@ -51,6 +51,7 @@ type Decoder struct {
+ 	d1q     layers.Dot1Q
+ 	gre     layers.GRE
+ 	eth     layers.Ethernet
++	loop    layers.Loopback
+ 	etherip layers.EtherIP
+ 	vxl     ownlayers.VXLAN
+ 	erspan  ownlayers.ERSPAN
+@@ -92,6 +93,9 @@ func NewDecoder(datalink layers.LinkType) *Decoder {
+ 		lt = layers.LayerTypeEthernet
+ 	case datalink == layers.LinkTypeLinuxSLL:
+ 		lt = layers.LayerTypeLinuxSLL
++	case datalink == layers.LinkTypeNull, datalink == layers.LinkTypeLoop:
++		// BSD loopback framing (e.g. macOS lo0): 4-byte address-family header.
++		lt = layers.LayerTypeLoopback
+ 	case datalink == layers.LinkTypeIPv6:
+ 		// Pure IPv6 raw interface (e.g. ip6gre without inner header).
+ 		lt = layers.LayerTypeIPv6
+@@ -116,6 +120,7 @@ func NewDecoder(datalink layers.LinkType) *Decoder {
+ 	dlp.AddDecodingLayer(&d.d1q)
+ 	dlp.AddDecodingLayer(&d.gre)
+ 	dlp.AddDecodingLayer(&d.eth)
++	dlp.AddDecodingLayer(&d.loop)
+ 	dlp.AddDecodingLayer(&d.etherip)
+ 	dlp.AddDecodingLayer(&d.vxl)
+ 	dlp.AddDecodingLayer(&d.erspan)
