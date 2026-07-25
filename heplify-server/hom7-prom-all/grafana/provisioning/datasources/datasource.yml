@@ -13,6 +13,8 @@ deleteDatasources:
 datasources:
   # <string, required> name of the datasource. Required
 - name: Prometheus
+  # <string, required> fixed UID so provisioned dashboards (hardcoded to this UID) resolve correctly
+  uid: cMoIj6tGz
   # <string, required> datasource type. Required
   type: prometheus
   # <string, required> access mode. direct or proxy. Required
