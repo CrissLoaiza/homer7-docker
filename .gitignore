@@ -3,3 +3,4 @@
 **/postgres-data/
 **/influx/
 **/grafana_data/
+heplify-server/hom7-prom-all/TEST/*

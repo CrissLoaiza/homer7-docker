@@ -73,6 +73,25 @@ if __name__ == "__main__":
         pkt = build_hep(5, "192.168.1.185", "192.168.1.185", 16000, 17000, 2002, payload, cid="synthetic-bad-call-1")
         send(target_host, target_port, pkt)
         print("sent bad-qos rtcp HEP, bytes=", len(pkt))
+    elif mode == "cdr":
+        callid = sys.argv[4] if len(sys.argv) > 4 else "synthetic-cdr-call-1"
+        payload = json.dumps({
+            "variables": {
+                "sip_call_id": callid,
+                "duration": "6",
+                "billsec": "6",
+                "rtp_audio_in_mos": "4.50",
+                "rtp_audio_in_jitter_min_variance": "0.25",
+                "rtp_audio_in_jitter_max_variance": "4.99",
+                "rtp_audio_in_jitter_loss_rate": "0.00",
+                "rtp_audio_in_packet_count": "298",
+                "rtp_audio_in_skip_packet_count": "4",
+                "rtp_audio_in_quality_percentage": "100.00",
+            }
+        })
+        pkt = build_hep(81, "192.168.148.10", "192.168.148.10", 0, 0, 2002, payload, cid=callid)
+        send(target_host, target_port, pkt)
+        print("sent CDR HEP (type 81), callid=", callid, "bytes=", len(pkt))
     else:
-        print("usage: send_hep.py [horaclifix|rtcp] [host] [port]")
+        print("usage: send_hep.py [horaclifix|rtcp|cdr] [host] [port] [callid]")
         sys.exit(1)

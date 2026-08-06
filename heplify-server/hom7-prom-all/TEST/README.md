@@ -4,6 +4,10 @@ Everything needed to generate a real SIP+RTP call (with genuine RTCP) into this
 stack, plus synthetic data for the two QoS dashboards that need a dedicated
 correlator (xRTP, Horaclifix) that this stack doesn't run.
 
+No Mac or baresip? See `freeswitch/README.md` for a Docker-only alternative:
+two FreeSWITCH containers calling each other, with heplify capturing SIP+RTCP
+straight from one of the containers.
+
 Two things live outside this folder and must exist before you start:
 
 - **heplify** (capture client) — `bin/heplify_darwin_arm64` is a macOS/arm64

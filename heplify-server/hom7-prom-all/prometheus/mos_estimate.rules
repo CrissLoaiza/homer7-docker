@@ -1,0 +1,50 @@
+groups:
+- name: mos_estimate
+  rules:
+  # Simplified E-model (ITU-T G.107 / Cisco formula), estimated from plain RTCP
+  # SR/RR data (jitter + fraction lost). This is NOT a real MOS reported by an
+  # endpoint via RTCP-XR (heplify_xrtp_mos) - it's the same kind of pseudo-MOS
+  # Homer's own QoS tab derives from raw RTCP, recomputed here so it can be
+  # graphed in Grafana. Assumes G.711 baseline (Ie=0, Bpl=25.1) and ignores
+  # RTT (no round-trip metric available from plain RTCP), so it's only
+  # accurate for low-latency links such as this test kit's local network.
+  #
+  # heplify_rtcp_jitter is in RTP timestamp units (RFC 3550), not ms - its
+  # scale depends on the stream's clock rate, which isn't exposed as a label
+  # here. We assume 8000Hz (G.711/G.729 - the vast majority of real PSTN/SIP
+  # trunk audio). For wideband test calls (Opus @48000Hz, G.722 @16000Hz,
+  # video @90000Hz) this under-converts and the estimate will look worse than
+  # reality - divide by the real clock rate instead if you know it.
+
+  - record: heplify:effective_latency_ms
+    expr: ((heplify_rtcp_jitter / 8) * 2) + 10
+
+  - record: heplify:delay_impairment
+    expr: >
+      0.024 * heplify:effective_latency_ms
+      + 0.11 * (heplify:effective_latency_ms - 177.3)
+        * (heplify:effective_latency_ms > bool 177.3)
+
+  - record: heplify:packet_loss_pct
+    expr: clamp_max(heplify_rtcp_fraction_lost, 100)
+
+  - record: heplify:equipment_impairment
+    expr: >
+      95 * heplify:packet_loss_pct
+      / (heplify:packet_loss_pct / 25.1 + 1)
+
+  - record: heplify:r_factor
+    expr: >
+      clamp(
+        93.2 - heplify:delay_impairment - heplify:equipment_impairment,
+        0, 100
+      )
+
+  - record: heplify:mos_estimate
+    expr: >
+      clamp(
+        1
+        + 0.035 * heplify:r_factor
+        + heplify:r_factor * (heplify:r_factor - 60) * (100 - heplify:r_factor) * 0.000007,
+        1, 4.5
+      )
